@@ -15,6 +15,8 @@ import { useToast } from "@/hooks/use-toast";
 import { customersApi } from "@/services/api";
 import { useCustomerBalance } from "@/hooks/useCustomerBalance";
 import { format } from "date-fns";
+import { GeminiService } from "@/services/geminiApi";
+import { Loader2 } from "lucide-react";
 
 const Credits = () => {
   const { toast } = useToast();
@@ -35,6 +37,8 @@ const Credits = () => {
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [messageText, setMessageText] = useState("");
   const [isAddCreditToExistingOpen, setIsAddCreditToExistingOpen] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [urduCustomerName, setUrduCustomerName] = useState("");
 
   const fetchAllCustomers = useCallback(async () => {
     try {
@@ -165,10 +169,26 @@ const Credits = () => {
     }
   };
 
-  const handleSendMessage = (customer: any) => {
+  const handleSendMessage = async (customer: any) => {
     setSelectedCustomer(customer);
-    setMessageText(`Dear ${customer.name}, your outstanding balance is PKR ${(customer.currentBalance || 0).toLocaleString()}. Please settle your dues at your earliest convenience. Thank you!`);
     setIsMessageModalOpen(true);
+    setIsTranslating(true);
+    
+    try {
+      // Translate customer name to Urdu
+      const translatedName = await GeminiService.translateToUrdu(customer.name);
+      setUrduCustomerName(translatedName);
+      
+      // Set Urdu message
+      setMessageText(`محترم ${translatedName}، آپ کا بقایا PKR ${Math.abs(customer.currentBalance || 0).toLocaleString()} ہے۔ براہ کرم جلد از جلد ادائیگی کریں۔ شکریہ!`);
+    } catch (error) {
+      console.error('Failed to translate:', error);
+      // Fallback to English
+      setMessageText(`Dear ${customer.name}, your outstanding balance is PKR ${Math.abs(customer.currentBalance || 0).toLocaleString()}. Please settle your dues at your earliest convenience. Thank you!`);
+      setUrduCustomerName(customer.name);
+    } finally {
+      setIsTranslating(false);
+    }
   };
 
   const handleSendWhatsApp = () => {
@@ -437,40 +457,77 @@ const Credits = () => {
 
       {/* Message Modal */}
       <Dialog open={isMessageModalOpen} onOpenChange={setIsMessageModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Send WhatsApp Message</DialogTitle>
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-green-100 dark:bg-green-900/30">
+                <MessageCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
+              <DialogTitle className="text-xl">Send WhatsApp Message</DialogTitle>
+            </div>
           </DialogHeader>
-          <div className="space-y-4">
+          
+          <div className="space-y-5">
             {selectedCustomer && (
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Sending to: <span className="font-semibold text-foreground">{selectedCustomer.name}</span>
-                </p>
-                {selectedCustomer.phone && (
-                  <p className="text-sm text-muted-foreground">
-                    Phone: <span className="font-semibold text-foreground">{selectedCustomer.phone}</span>
-                  </p>
-                )}
+              <div className="p-4 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800">
+                <div className="flex items-start gap-3">
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-muted-foreground">Sending to:</span>
+                      <span className="font-bold text-foreground text-lg">{urduCustomerName || selectedCustomer.name}</span>
+                    </div>
+                    {selectedCustomer.phone && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Phone className="h-4 w-4 text-green-600 dark:text-green-400" />
+                        <span className="font-semibold text-foreground">{selectedCustomer.phone}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 pt-1">
+                      <DollarSign className="h-4 w-4 text-red-600 dark:text-red-400" />
+                      <span className="text-sm text-muted-foreground">Outstanding:</span>
+                      <span className="font-bold text-red-600 dark:text-red-400">
+                        PKR {Math.abs(selectedCustomer.currentBalance || 0).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
-            <div>
-              <Label htmlFor="message">Message</Label>
-              <Textarea
-                id="message"
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-                rows={6}
-                className="mt-1"
-              />
+
+            <div className="space-y-2">
+              <Label htmlFor="message" className="text-base font-semibold">Message</Label>
+              {isTranslating ? (
+                <div className="flex items-center justify-center p-8 border-2 border-dashed rounded-lg bg-accent/50">
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                    <p className="text-sm text-muted-foreground">Translating to Urdu...</p>
+                  </div>
+                </div>
+              ) : (
+                <Textarea
+                  id="message"
+                  value={messageText}
+                  onChange={(e) => setMessageText(e.target.value)}
+                  rows={6}
+                  className="font-sans resize-none border-2 focus:border-green-500 dark:focus:border-green-400 transition-colors"
+                  dir="rtl"
+                  placeholder="پیغام یہاں لکھیں..."
+                />
+              )}
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsMessageModalOpen(false)}>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsMessageModalOpen(false)}
+                className="px-6"
+              >
                 Cancel
               </Button>
               <Button 
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 shadow-lg shadow-green-500/30"
                 onClick={handleSendWhatsApp}
+                disabled={isTranslating}
               >
                 <MessageCircle className="h-4 w-4 mr-2" />
                 Send via WhatsApp
