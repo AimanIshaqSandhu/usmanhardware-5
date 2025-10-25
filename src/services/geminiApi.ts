@@ -240,4 +240,41 @@ Text to translate: "${text}"`;
       return text; // Return original text if translation fails
     }
   }
+
+  static async rewriteRomanUrduToUrdu(text: string): Promise<string> {
+    try {
+      const systemPrompt = `You are an expert Urdu translator. The user has written a message in Roman Urdu (Urdu written in English/Latin script). Your task is to convert this Roman Urdu text into proper Urdu script (اردو).
+
+IMPORTANT RULES:
+1. Return ONLY the Urdu script translation
+2. Do NOT add any explanations, notes, or additional text
+3. Maintain the exact meaning and tone of the original message
+4. Use proper Urdu grammar and spelling
+5. Keep numbers and currency symbols (like PKR) as they are
+
+Roman Urdu text to convert:
+"${text}"`;
+
+      const request: GeminiRequest = {
+        contents: [
+          {
+            role: 'user',
+            parts: [{ text: systemPrompt }]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.2,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 512,
+        }
+      };
+
+      const response = await this.makeRequest(request);
+      return response.trim();
+    } catch (error) {
+      console.error('Roman Urdu to Urdu conversion failed:', error);
+      throw error;
+    }
+  }
 }

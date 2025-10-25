@@ -39,6 +39,8 @@ const Credits = () => {
   const [isAddCreditToExistingOpen, setIsAddCreditToExistingOpen] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const [urduCustomerName, setUrduCustomerName] = useState("");
+  const [defaultMessage, setDefaultMessage] = useState("");
+  const [isRewriting, setIsRewriting] = useState(false);
 
   const fetchAllCustomers = useCallback(async () => {
     try {
@@ -180,14 +182,42 @@ const Credits = () => {
       setUrduCustomerName(translatedName);
       
       // Set Urdu message
-      setMessageText(`محترم ${translatedName}، آپ کا بقایا PKR ${Math.abs(customer.currentBalance || 0).toLocaleString()} ہے۔ براہ کرم جلد از جلد ادائیگی کریں۔ شکریہ!`);
+      const urduMessage = `محترم ${translatedName}، آپ کا بقایا PKR ${Math.abs(customer.currentBalance || 0).toLocaleString()} ہے۔ براہ کرم جلد از جلد ادائیگی کریں۔ شکریہ!`;
+      setMessageText(urduMessage);
+      setDefaultMessage(urduMessage); // Store as default
     } catch (error) {
       console.error('Failed to translate:', error);
       // Fallback to English
-      setMessageText(`Dear ${customer.name}, your outstanding balance is PKR ${Math.abs(customer.currentBalance || 0).toLocaleString()}. Please settle your dues at your earliest convenience. Thank you!`);
+      const fallbackMessage = `Dear ${customer.name}, your outstanding balance is PKR ${Math.abs(customer.currentBalance || 0).toLocaleString()}. Please settle your dues at your earliest convenience. Thank you!`;
+      setMessageText(fallbackMessage);
+      setDefaultMessage(fallbackMessage);
       setUrduCustomerName(customer.name);
     } finally {
       setIsTranslating(false);
+    }
+  };
+
+  const handleRewriteMessage = async () => {
+    if (!messageText || messageText === defaultMessage) return;
+    
+    setIsRewriting(true);
+    try {
+      const rewrittenUrdu = await GeminiService.rewriteRomanUrduToUrdu(messageText);
+      setMessageText(rewrittenUrdu);
+      setDefaultMessage(rewrittenUrdu); // Update default to new rewritten version
+      toast({
+        title: "Message Rewritten",
+        description: "Your message has been converted to Urdu script",
+      });
+    } catch (error) {
+      console.error('Failed to rewrite message:', error);
+      toast({
+        title: "Rewrite Failed",
+        description: "Failed to convert message to Urdu. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsRewriting(false);
     }
   };
 
@@ -495,7 +525,31 @@ const Credits = () => {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="message" className="text-base font-semibold">Message</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="message" className="text-base font-semibold">Message</Label>
+                {messageText !== defaultMessage && !isTranslating && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={handleRewriteMessage}
+                    disabled={isRewriting}
+                    className="bg-blue-50 hover:bg-blue-100 text-blue-600 border-blue-200 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800"
+                  >
+                    {isRewriting ? (
+                      <>
+                        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        Rewriting...
+                      </>
+                    ) : (
+                      <>
+                        <MessageCircle className="h-3 w-3 mr-1" />
+                        Rewrite in Urdu
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
               {isTranslating ? (
                 <div className="flex items-center justify-center p-8 border-2 border-dashed rounded-lg bg-accent/50">
                   <div className="flex flex-col items-center gap-2">
