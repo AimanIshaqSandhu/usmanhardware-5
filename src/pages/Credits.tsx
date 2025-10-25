@@ -409,7 +409,7 @@ const Credits = () => {
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-sm text-muted-foreground">Outstanding</p>
-                      <p className={`text-lg font-bold ${ (customer.currentBalance || 0) < 0 ? 'text-red-600' : 'text-green-600' }`}>
+                      <p className="text-lg font-bold text-red-600 dark:text-red-500">
                         PKR {Math.abs(customer.currentBalance || 0).toLocaleString()}
                       </p>
                     </div>
@@ -447,8 +447,9 @@ const Credits = () => {
                     </Button>
                     <Button
                       size="sm"
-                      variant="ghost"
+                      variant="outline"
                       onClick={() => handleViewHistory(customer)}
+                      className="bg-foreground/5 hover:bg-foreground/10 border-border dark:bg-foreground/10 dark:hover:bg-foreground/15"
                     >
                       <History className="h-4 w-4 mr-1" />
                       History
@@ -719,7 +720,7 @@ const AddCreditToExistingDialog = ({
   };
 
   return (
-    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card/60 backdrop-blur-md">
+    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background">
       <DialogHeader>
         <DialogTitle className="text-2xl">Add Credit to Existing Customer</DialogTitle>
       </DialogHeader>
