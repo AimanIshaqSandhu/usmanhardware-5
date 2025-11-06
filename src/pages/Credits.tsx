@@ -251,8 +251,8 @@ const Credits = () => {
   });
 
   const totalCredits = customersWithCredits
-    .filter(c => (c.currentBalance || 0) < 0)
-    .reduce((sum, c) => sum + Math.abs(c.currentBalance || 0), 0);
+    .filter(c => (c.currentBalance || 0) > 0)
+    .reduce((sum, c) => sum + (c.currentBalance || 0), 0);
 
   if (loading) {
     return (
