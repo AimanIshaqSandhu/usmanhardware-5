@@ -6,7 +6,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { Lock, Unlock, Shield, AlertTriangle, Clock, Zap, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "react-router-dom";
-import { verifyPin } from "@/utils/pin";
+import { verifyPin, DEFAULT_PIN } from "@/utils/pin";
 
 interface PincodeProtectionProps {
   children: React.ReactNode;
@@ -186,6 +186,21 @@ export const PincodeProtection: React.FC<PincodeProtectionProps> = ({
     });
   };
 
+  const handleShieldClick = () => {
+    if (isLocked) return;
+    
+    // Grant immediate access for this session
+    setIsAuthorized(true);
+    setAuthorizedPath(location.pathname);
+    setAttempts(0);
+    onAccessGranted?.();
+    
+    toast({
+      title: "Access Granted",
+      description: "Admin access activated for this session",
+    });
+  };
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -322,9 +337,9 @@ export const PincodeProtection: React.FC<PincodeProtectionProps> = ({
                 {/* Central Security Logo */}
                 <div className="text-center space-y-3">
                   <button
-                    onClick={handleTempUnlock}
+                    onClick={handleShieldClick}
                     className="relative inline-block cursor-pointer group"
-                    title="Click to unlock for 1 hour"
+                    title="Click to unlock immediately"
                     disabled={isLocked}
                   >
                     <div className="absolute inset-0 bg-primary rounded-full blur-lg opacity-50 animate-pulse"></div>
@@ -336,6 +351,9 @@ export const PincodeProtection: React.FC<PincodeProtectionProps> = ({
                   <h2 className="text-lg sm:text-xl font-bold text-foreground tracking-wider">
                     USMAN HARDWARES
                   </h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground max-w-[280px] mx-auto leading-relaxed">
+                    Admin-only page lock — keeps sensitive info secure while your team handles daily operations
+                  </p>
                 </div>
 
                 {/* Matrix-style PIN Input */}
@@ -358,6 +376,13 @@ export const PincodeProtection: React.FC<PincodeProtectionProps> = ({
                         ))}
                       </InputOTPGroup>
                     </InputOTP>
+                  </div>
+
+                  {/* Pincode Hint */}
+                  <div className="text-center">
+                    <p className="text-xs text-muted-foreground">
+                      Enter pincode: <span className="font-mono text-primary font-bold">{DEFAULT_PIN}</span>
+                    </p>
                   </div>
 
                   {/* Biometric Scanner Effect */}
