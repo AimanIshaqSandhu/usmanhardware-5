@@ -265,19 +265,19 @@ const Credits = () => {
   }
 
   return (
-    <div className="flex-1 p-6 space-y-4 min-h-[calc(100vh-65px)] bg-background">
+    <div className="flex-1 p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4 min-h-[calc(100vh-65px)] bg-background no-horizontal-scroll">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Customer Credits</h1>
-          <p className="text-muted-foreground">Manage and track customer outstanding balances</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Customer Credits</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Manage and track customer outstanding balances</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Dialog open={isAddCreditToExistingOpen} onOpenChange={setIsAddCreditToExistingOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="bg-orange-50 hover:bg-orange-100 text-orange-600 border-orange-200">
+              <Button variant="outline" className="bg-orange-50 hover:bg-orange-100 text-orange-600 border-orange-200 w-full sm:w-auto">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Credit to Existing
+                <span className="hidden xs:inline">Add Credit to </span>Existing
               </Button>
             </DialogTrigger>
             <AddCreditToExistingDialog 
@@ -288,9 +288,9 @@ const Credits = () => {
           </Dialog>
           <Dialog open={isAddCustomerOpen} onOpenChange={setIsAddCustomerOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
                 <Plus className="h-4 w-4 mr-2" />
-                Add New Customer
+                <span className="hidden xs:inline">Add New </span>Customer
               </Button>
             </DialogTrigger>
             <CustomerDialog onSubmit={handleAddCustomer} onClose={() => setIsAddCustomerOpen(false)} />
@@ -299,38 +299,38 @@ const Credits = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <Card className="border-l-4 border-l-red-500">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <CreditCard className="h-8 w-8 text-red-500" />
-              <div>
-                <p className="text-sm text-muted-foreground">Total Credits</p>
-                <p className="text-2xl font-bold text-red-600">PKR {totalCredits.toLocaleString()}</p>
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <CreditCard className="h-6 w-6 sm:h-8 sm:w-8 text-red-500 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-muted-foreground">Total Credits</p>
+                <p className="text-lg sm:text-2xl font-bold text-red-600 truncate">PKR {totalCredits.toLocaleString()}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-l-orange-500">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <Users className="h-8 w-8 text-orange-500" />
-              <div>
-                <p className="text-sm text-muted-foreground">Customers with Credits</p>
-                <p className="text-2xl font-bold text-orange-600">{customersWithCredits.length}</p>
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Users className="h-6 w-6 sm:h-8 sm:w-8 text-orange-500 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-muted-foreground">Customers with Credits</p>
+                <p className="text-lg sm:text-2xl font-bold text-orange-600">{customersWithCredits.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-l-4 border-l-blue-500">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="h-8 w-8 text-blue-500" />
-              <div>
-                <p className="text-sm text-muted-foreground">Average Credit</p>
-                <p className="text-2xl font-bold text-blue-600">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <AlertCircle className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500 flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-muted-foreground">Average Credit</p>
+                <p className="text-lg sm:text-2xl font-bold text-blue-600 truncate">
                   PKR {customersWithCredits.length > 0 ? Math.round(totalCredits / customersWithCredits.length).toLocaleString() : 0}
                 </p>
               </div>
@@ -341,8 +341,8 @@ const Credits = () => {
 
       {/* Filters */}
       <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
