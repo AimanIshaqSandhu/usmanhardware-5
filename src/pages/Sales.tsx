@@ -952,55 +952,55 @@ const formatPakistaniTime = (timeString: string): string => {
 
         {/* Products Section - NO SCROLLBARS, FIXED HEIGHT */}
         <div className="flex-1 overflow-hidden bg-background flex flex-col min-h-0">
-          <div className="p-1  md:p-4 flex-shrink-0">
-            <div className="flex items-center gap-2 mb-3">
-              <h2 className="text-base md:text-lg font-semibold text-foreground flex items-center gap-2">
+          <div className="p-2 sm:p-3 md:p-4 flex-shrink-0">
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <h2 className="text-sm sm:text-base md:text-lg font-semibold text-foreground flex items-center gap-2">
                 <Package className="h-4 w-4 text-blue-600" />
-                Products
-                <Badge variant="outline" className="ml-1 text-xs">{pinnedProducts.length} pinned</Badge>
+                <span className="hidden xs:inline">Products</span>
+                <Badge variant="outline" className="text-[10px] sm:text-xs">{pinnedProducts.length} pinned</Badge>
                 {incompleteQuantityCount > 0 && (
-                  <Badge variant="outline" className="ml-1 text-xs text-orange-600 border-orange-300">
+                  <Badge variant="outline" className="text-[10px] sm:text-xs text-orange-600 border-orange-300">
                     <AlertTriangle className="h-3 w-3 mr-1" />
-                    {incompleteQuantityCount} incomplete
+                    {incompleteQuantityCount}
                   </Badge>
                 )}
               </h2>
-              <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full hidden md:inline">
+              <span className="text-[10px] sm:text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full hidden lg:inline">
                 {totalCartItems} items - PKR {totalCartValue.toLocaleString()}
               </span>
               {/* Quick Add Product Button */}
               <Button 
                 size="sm" 
-                className="bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm h-8 md:h-9 px-2 md:px-3"
+                className="bg-blue-600 hover:bg-blue-700 text-white text-[10px] sm:text-xs h-7 sm:h-8 md:h-9 px-2 sm:px-3"
                 onClick={() => setIsTodaysOrdersOpen(true)}
               >
-                Today's Orders
+                <span className="hidden sm:inline">Today's </span>Orders
               </Button>
               <Button
                 onClick={() => setIsQuickProductAddOpen(true)}
-                className="bg-green-600 hover:bg-green-700 text-white text-xs md:text-sm h-8 md:h-9 px-2 md:px-3"
+                className="bg-green-600 hover:bg-green-700 text-white text-[10px] sm:text-xs h-7 sm:h-8 md:h-9 px-2 sm:px-3"
               >
-                <Plus className="h-3 w-3 md:h-4 md:w-4 mr-1" />
-                Quick Add Product
+                <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                <span className="hidden sm:inline">Quick </span>Add
               </Button>
               
             </div>
             
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-1 sm:gap-2 mb-3 sm:mb-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-3 w-3 sm:h-4 sm:w-4" />
                 <Input
-                  placeholder="Search products by name or SKU..."
+                  placeholder="Search products..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 h-9 md:h-10 bg-background border-input text-sm"
+                  className="pl-7 sm:pl-10 h-8 sm:h-9 md:h-10 bg-background border-input text-xs sm:text-sm"
                 />
               </div>
               
               {/* Category Dropdown */}
               <Select value={selectedCategory || "all"} onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}>
-                <SelectTrigger className="w-40 h-9 md:h-10 bg-background border-input">
-                  <Filter className="h-4 w-4 mr-2" />
+                <SelectTrigger className="w-28 sm:w-36 md:w-40 h-8 sm:h-9 md:h-10 bg-background border-input text-xs sm:text-sm">
+                  <Filter className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent className="bg-background border-input shadow-lg z-50">
@@ -1018,8 +1018,8 @@ const formatPakistaniTime = (timeString: string): string => {
               
               {/* Layout Dropdown */}
               <Select value={productsLayout.toString()} onValueChange={(value) => handleLayoutChange(parseInt(value))}>
-                <SelectTrigger className="w-24 h-9 md:h-10 bg-background border-input">
-                  <LayoutGrid className="h-4 w-4" />
+                <SelectTrigger className="w-20 sm:w-24 h-8 sm:h-9 md:h-10 bg-background border-input text-xs sm:text-sm">
+                  <LayoutGrid className="h-3 w-3 sm:h-4 sm:w-4" />
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-background border-input shadow-lg z-50">
@@ -1037,7 +1037,7 @@ const formatPakistaniTime = (timeString: string): string => {
           </div>
 
           {/* Responsive Products Grid - INTERNAL SCROLLING ONLY */}
-          <div className="flex-1 overflow-auto px-3 md:px-4 pb-4 min-h-0">
+          <div className="flex-1 overflow-auto px-2 sm:px-3 md:px-4 pb-3 sm:pb-4 min-h-0">
             {/* Conditional layout: slim view for single column, grid for others */}
             {productsLayout === 1 ? (
               <div className="space-y-2">
@@ -1057,13 +1057,13 @@ const formatPakistaniTime = (timeString: string): string => {
                 ))}
               </div>
             ) : (
-              <div className={`grid gap-2 ${
+              <div className={`grid gap-1.5 sm:gap-2 ${
                 productsLayout === 2 ? 'grid-cols-2' :
-                productsLayout === 3 ? 'grid-cols-2 md:grid-cols-3' :
-                productsLayout === 4 ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' :
-                productsLayout === 5 ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5' :
-                productsLayout === 6 ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6' :
-                'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7'
+                productsLayout === 3 ? 'grid-cols-2 sm:grid-cols-3' :
+                productsLayout === 4 ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4' :
+                productsLayout === 5 ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5' :
+                productsLayout === 6 ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6' :
+                'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7'
               }`}>
                 {sortedProducts.map((product) => (
                   <ProductCard

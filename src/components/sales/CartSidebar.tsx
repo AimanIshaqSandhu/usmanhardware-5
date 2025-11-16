@@ -179,32 +179,28 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
 
   return (
     <div
-      className="w-64 bg-card border-l border-border shadow-lg flex flex-col h-screen
+      className="w-full bg-card border-l border-border shadow-lg flex flex-col h-screen
       fixed right-0 top-0 z-40
-      max-w-full
-      sm:relative sm:w-64 sm:max-w-xs"
-      style={{
-        width: '100vw',
-        maxWidth: 320,
-      }}
+      sm:relative sm:w-80 md:w-96
+      max-w-full"
     >
       <div className="flex-1 min-h-0 flex flex-col bg-card">
         {/* Toggle Button */}
-        <div className="p-2 border-b border-border bg-muted/50 flex-shrink-0 flex justify-between items-center">
-          <h3 className="font-medium text-card-foreground text-sm">Cart ({cart.length})</h3>
+        <div className="p-2 sm:p-3 border-b border-border bg-muted/50 flex-shrink-0 flex justify-between items-center">
+          <h3 className="font-medium text-card-foreground text-sm sm:text-base">Cart ({cart.length})</h3>
           <Button
             variant="ghost"
             size="sm"
             onClick={onToggleCollapse}
-            className="h-6 w-6 p-0 hover:bg-accent"
+            className="h-6 w-6 sm:h-7 sm:w-7 p-0 hover:bg-accent"
             title="Collapse Cart"
           >
-            <ChevronRight className="h-3 w-3" />
+            <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         </div>
 
         {/* Customer, Payment, Order Status */}
-        <div className="p-1 border-b border-border bg-muted/50 flex-shrink-0">
+        <div className="p-2 sm:p-3 border-b border-border bg-muted/50 flex-shrink-0">
 
           {selectedCustomer ? (
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 p-2 rounded-lg">
@@ -468,22 +464,22 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
 
       {/* FIXED CHECKOUT SECTION - ALWAYS VISIBLE */}
       {cart.length > 0 && (
-        <div className="p-3 border-t border-border bg-card flex-shrink-0 sticky bottom-0 z-50 w-full">
-          <div className="space-y-2 mb-3">
+        <div className="p-2 sm:p-3 border-t border-border bg-card flex-shrink-0 sticky bottom-0 z-50 w-full">
+          <div className="space-y-1.5 sm:space-y-2 mb-2 sm:mb-3">
             <div>
               <div className="flex justify-between font-bold">
-                <span className="text-sm text-card-foreground">Total:</span>
-                <span className="text-green-600 text-sm">PKR {getCartTotal().toLocaleString()}</span>
+                <span className="text-xs sm:text-sm text-card-foreground">Total:</span>
+                <span className="text-green-600 text-sm sm:text-base">PKR {getCartTotal().toLocaleString()}</span>
               </div>
             </div>
           </div>
           <Button
             onClick={onCheckout}
             disabled={isProcessingSale}
-            className="w-full bg-green-600 hover:bg-green-700 text-white h-10 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-green-600 hover:bg-green-700 text-white h-9 sm:h-10 text-xs sm:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             size="lg"
           >
-            {isProcessingSale ? 'Processing Sale...' : `Complete Sale (${paymentMethod === 'cash' ? 'Cash' : paymentMethod === 'credit' ? 'Credit' : 'Card'})`}
+            {isProcessingSale ? 'Processing...' : `Complete Sale (${paymentMethod === 'cash' ? 'Cash' : paymentMethod === 'credit' ? 'Credit' : 'Card'})`}
           </Button>
         </div>
       )}
