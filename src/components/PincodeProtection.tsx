@@ -335,11 +335,11 @@ export const PincodeProtection: React.FC<PincodeProtectionProps> = ({
               {/* Content Container */}
               <div className="relative z-10 p-6 sm:p-8 space-y-6 flex flex-col items-center justify-center max-w-[320px]">
                 {/* Central Security Logo */}
-                <div className="text-center space-y-3">
+                <div className="text-center space-y-4">
                   <button
                     onClick={handleShieldClick}
                     className="relative inline-block cursor-pointer group"
-                    title="Click to unlock immediately"
+                    title="Click to unlock"
                     disabled={isLocked}
                   >
                     <div className="absolute inset-0 bg-primary rounded-full blur-lg opacity-50 animate-pulse"></div>
@@ -348,16 +348,18 @@ export const PincodeProtection: React.FC<PincodeProtectionProps> = ({
                       <div className="absolute inset-0 border-2 border-primary-foreground/30 rounded-full animate-spin" style={{ animationDuration: '3s' }}></div>
                     </div>
                   </button>
-                  <h2 className="text-lg sm:text-xl font-bold text-foreground tracking-wider">
-                    USMAN HARDWARES
-                  </h2>
-                  <p className="text-xs sm:text-sm text-muted-foreground max-w-[280px] mx-auto leading-relaxed">
-                    Admin-only page lock — keeps sensitive info secure while your team handles daily operations
-                  </p>
+                  <div className="space-y-1">
+                    <h2 className="text-lg sm:text-xl font-bold text-foreground tracking-wider">
+                      USMAN HARDWARES
+                    </h2>
+                    <p className="text-xs text-muted-foreground/80">
+                      Admin access required
+                    </p>
+                  </div>
                 </div>
 
-                {/* Matrix-style PIN Input */}
-                <div className="space-y-4 w-full">
+                {/* PIN Input */}
+                <div className="space-y-3 w-full">
                   <div className="flex justify-center">
                     <InputOTP
                       maxLength={7}
@@ -378,14 +380,11 @@ export const PincodeProtection: React.FC<PincodeProtectionProps> = ({
                     </InputOTP>
                   </div>
 
-                  {/* Pincode Hint */}
-                  <div className="text-center">
-                    <p className="text-xs text-muted-foreground">
-                      Enter pincode: <span className="font-mono text-primary font-bold">{DEFAULT_PIN}</span>
-                    </p>
-                  </div>
+                  <p className="text-center text-xs text-muted-foreground/60">
+                    PIN: <span className="font-mono text-primary">{DEFAULT_PIN}</span>
+                  </p>
 
-                  {/* Biometric Scanner Effect */}
+                  {/* Scanner Effect */}
                   <div className="flex justify-center">
                     <div className="relative w-24 sm:w-32 h-1 bg-muted rounded-full overflow-hidden">
                       <div className="absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-primary to-primary/80 rounded-full animate-pulse" style={{
