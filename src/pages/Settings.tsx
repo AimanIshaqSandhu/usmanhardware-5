@@ -92,7 +92,7 @@ export default function Settings() {
         return {
           profile: {
             name: "Admin",
-            email: "admin@usmanhardware.com",
+            email: "admin@zaidawn.site",
             phone: "",
             role: "Owner",
           },

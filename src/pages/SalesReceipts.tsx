@@ -237,7 +237,7 @@ const SalesReceipts = () => {
       yPos += 3;
       pdf.text('For queries: +92-322-6506118', pageWidth / 2, yPos, { align: 'center' });
       yPos += 3;
-      pdf.text('www.usmanhardware.com', pageWidth / 2, yPos, { align: 'center' });
+      pdf.text('www.zaidawn.site', pageWidth / 2, yPos, { align: 'center' });
       yPos += 5;
       
       pdf.setFontSize(6);
