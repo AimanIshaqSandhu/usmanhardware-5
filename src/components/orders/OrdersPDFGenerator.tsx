@@ -157,7 +157,7 @@ export const useOrderPDFGenerator = () => {
       pdf.text('Premium Furniture Hardware', pageWidth / 2, yPos + 13, { align: 'center' });
       pdf.text('Hafizabad, Punjab', pageWidth / 2, yPos + 18, { align: 'center' });
       pdf.text('+92-322-6506118', pageWidth / 2, yPos + 23, { align: 'center' });
-      pdf.text('www.zaidawn.site', pageWidth / 2, yPos + 28, { align: 'center' });
+      pdf.text('www.usmanhardware.com', pageWidth / 2, yPos + 28, { align: 'center' });
 
       yPos += 40;
 

@@ -395,29 +395,29 @@ const Customers = () => {
   };
 
   return (
-    <div className="flex-1 p-3 sm:p-4 md:p-6 space-y-3 min-h-[calc(100vh-65px)] bg-background no-horizontal-scroll">
+    <div className="flex-1 p-6 space-y-3 min-h-[calc(100vh-65px)] bg-background no-horizontal-scroll">
       {/* HEADER + ACTIONS */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-        <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex items-center gap-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Customer Management</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">Manage customer profiles, dues, and transactions</p>
+            <h1 className="text-3xl font-bold text-foreground">Customer Management</h1>
+            <p className="text-muted-foreground">Manage customer profiles, dues, and transactions</p>
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
           <Button 
             variant="outline" 
             onClick={handleExportAllCustomers}
-            className="bg-purple-50 hover:bg-purple-100 text-purple-600 border-purple-200 w-full sm:w-auto text-sm"
+            className="bg-purple-50 hover:bg-purple-100 text-purple-600 border-purple-200 w-full sm:w-auto"
           >
             <Download className="h-4 w-4 mr-2" />
-            <span className="hidden xs:inline">Export All </span>Customers
+            Export All Customers
           </Button>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto text-sm">
+              <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
                 <Plus className="h-4 w-4 mr-2" />
-                <span className="hidden xs:inline">Add </span>Customer
+                Add Customer
               </Button>
             </DialogTrigger>
             <CustomerDialog onSubmit={handleAddCustomer} onClose={() => setIsDialogOpen(false)} />

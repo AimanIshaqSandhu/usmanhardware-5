@@ -6,7 +6,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { Lock, Unlock, Shield, AlertTriangle, Clock, Zap, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "react-router-dom";
-import { verifyPin, DEFAULT_PIN } from "@/utils/pin";
+import { verifyPin } from "@/utils/pin";
 
 interface PincodeProtectionProps {
   children: React.ReactNode;
@@ -186,21 +186,6 @@ export const PincodeProtection: React.FC<PincodeProtectionProps> = ({
     });
   };
 
-  const handleShieldClick = () => {
-    if (isLocked) return;
-    
-    // Grant immediate access for this session
-    setIsAuthorized(true);
-    setAuthorizedPath(location.pathname);
-    setAttempts(0);
-    onAccessGranted?.();
-    
-    toast({
-      title: "Access Granted",
-      description: "Admin access activated for this session",
-    });
-  };
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -314,15 +299,15 @@ export const PincodeProtection: React.FC<PincodeProtectionProps> = ({
       </div>
 
       {/* Central Interface */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen p-2 sm:p-4">
+      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
         <div className={`transition-all duration-1500 ${showAnimation ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
           
           {/* Central Security Interface - Circular */}
           <div className="relative">
             {/* Holographic Frame */}
-            <div className="absolute -inset-4 sm:-inset-8 bg-gradient-to-r from-primary/10 via-primary/10 to-primary/10 rounded-full blur-xl animate-pulse"></div>
+            <div className="absolute -inset-8 bg-gradient-to-r from-primary/10 via-primary/10 to-primary/10 rounded-full blur-xl animate-pulse"></div>
             
-            <div className="relative w-[320px] h-[320px] sm:w-[380px] sm:h-[380px] md:w-[420px] md:h-[420px] backdrop-blur-xl bg-card/60 border-2 border-primary/30 shadow-2xl shadow-primary/20 rounded-full overflow-hidden flex items-center justify-center">
+            <div className="relative w-[380px] h-[380px] sm:w-[420px] sm:h-[420px] backdrop-blur-xl bg-card/60 border-2 border-primary/30 shadow-2xl shadow-primary/20 rounded-full overflow-hidden flex items-center justify-center">
               {/* Animated Border Ring */}
               <div className="absolute inset-0 border-2 border-primary/20 rounded-full"></div>
               
@@ -333,33 +318,28 @@ export const PincodeProtection: React.FC<PincodeProtectionProps> = ({
               <div className="absolute right-8 top-1/2 -translate-y-1/2 h-1 w-8 bg-primary/50"></div>
 
               {/* Content Container */}
-              <div className="relative z-10 p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6 flex flex-col items-center justify-center max-w-[280px] sm:max-w-[320px]">
+              <div className="relative z-10 p-6 sm:p-8 space-y-6 flex flex-col items-center justify-center max-w-[320px]">
                 {/* Central Security Logo */}
-                <div className="text-center space-y-4">
+                <div className="text-center space-y-3">
                   <button
-                    onClick={handleShieldClick}
+                    onClick={handleTempUnlock}
                     className="relative inline-block cursor-pointer group"
-                    title="Click to unlock"
+                    title="Click to unlock for 1 hour"
                     disabled={isLocked}
                   >
                     <div className="absolute inset-0 bg-primary rounded-full blur-lg opacity-50 animate-pulse"></div>
-                    <div className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center shadow-lg shadow-primary/50 transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
-                      <Shield className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-primary-foreground animate-pulse" />
+                    <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center shadow-lg shadow-primary/50 transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
+                      <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-primary-foreground animate-pulse" />
                       <div className="absolute inset-0 border-2 border-primary-foreground/30 rounded-full animate-spin" style={{ animationDuration: '3s' }}></div>
                     </div>
                   </button>
-                  <div className="space-y-1">
-                    <h2 className="text-base sm:text-lg md:text-xl font-bold text-foreground tracking-wider">
-                      USMAN HARDWARES
-                    </h2>
-                    <p className="text-[10px] sm:text-xs text-muted-foreground/80">
-                      Admin access required
-                    </p>
-                  </div>
+                  <h2 className="text-lg sm:text-xl font-bold text-foreground tracking-wider">
+                    USMAN HARDWARES
+                  </h2>
                 </div>
 
-                {/* PIN Input */}
-                <div className="space-y-3 w-full">
+                {/* Matrix-style PIN Input */}
+                <div className="space-y-4 w-full">
                   <div className="flex justify-center">
                     <InputOTP
                       maxLength={7}
@@ -368,25 +348,21 @@ export const PincodeProtection: React.FC<PincodeProtectionProps> = ({
                       onComplete={handlePinSubmit}
                       disabled={isLocked}
                     >
-                      <InputOTPGroup className="gap-0.5 sm:gap-1 md:gap-2">
+                      <InputOTPGroup className="gap-1 sm:gap-2">
                         {[...Array(7)].map((_, index) => (
                           <InputOTPSlot
                             key={index}
                             index={index}
-                            className="w-7 h-9 sm:w-8 sm:h-10 md:w-10 md:h-12 text-sm sm:text-base md:text-lg font-mono font-bold border-2 border-primary/40 bg-background/60 text-primary focus:border-primary focus:ring-2 focus:ring-primary/30 focus:bg-background/80 transition-all duration-300 rounded-lg backdrop-blur-sm shadow-lg shadow-primary/20"
+                            className="w-8 h-10 sm:w-10 sm:h-12 text-base sm:text-lg font-mono font-bold border-2 border-primary/40 bg-background/60 text-primary focus:border-primary focus:ring-2 focus:ring-primary/30 focus:bg-background/80 transition-all duration-300 rounded-lg backdrop-blur-sm shadow-lg shadow-primary/20"
                           />
                         ))}
                       </InputOTPGroup>
                     </InputOTP>
                   </div>
 
-                  <p className="text-center text-[10px] sm:text-xs text-muted-foreground/60">
-                    PIN: <span className="font-mono text-primary">{DEFAULT_PIN}</span>
-                  </p>
-
-                  {/* Scanner Effect */}
+                  {/* Biometric Scanner Effect */}
                   <div className="flex justify-center">
-                    <div className="relative w-20 sm:w-24 md:w-32 h-1 bg-muted rounded-full overflow-hidden">
+                    <div className="relative w-24 sm:w-32 h-1 bg-muted rounded-full overflow-hidden">
                       <div className="absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-primary to-primary/80 rounded-full animate-pulse" style={{
                         animation: 'scanner 2s ease-in-out infinite'
                       }}></div>
