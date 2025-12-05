@@ -39,29 +39,47 @@ export interface ProfileResponse {
   user: AuthUser;
 }
 
-const AUTH_BASE_URL = 'https://usmanhardware.site/api/auth';
+// Get auth base URL from the main API config (same server, different path)
+const getAuthBaseUrl = () => {
+  const baseUrl = apiConfig.getBaseUrl();
+  // Convert from /wp-json/ims/v1 to /api/auth format
+  // e.g., https://usmanhardware.site/wp-json/ims/v1 -> https://usmanhardware.site/api/auth
+  const url = new URL(baseUrl);
+  return `${url.origin}/api/auth`;
+};
 
 const authRequest = async <T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> => {
-  const url = `${AUTH_BASE_URL}${endpoint}`;
+  const url = `${getAuthBaseUrl()}${endpoint}`;
+  
+  console.log('Auth request to:', url);
 
-  const response = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  });
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      ...options,
+    });
 
-  const data = await response.json();
+    const data = await response.json();
+    console.log('Auth response:', response.status, data);
 
-  if (!response.ok) {
-    throw new Error(data.error || data.message || 'Request failed');
+    if (!response.ok) {
+      throw new Error(data.error || data.message || `Request failed with status ${response.status}`);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Auth request error:', error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Network request failed');
   }
-
-  return data;
 };
 
 export const authApi = {

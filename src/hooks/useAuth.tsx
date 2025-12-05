@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useToast } from './use-toast';
 import { authApi, tokenManager, AuthUser, LoginCredentials } from '@/services/authApi';
 
@@ -29,7 +28,6 @@ export const useAuth = () => {
 
   const login = async (credentials: LoginCredentials) => {
     try {
-      setLoading(true);
       const response = await authApi.login(credentials);
 
       tokenManager.setTokens(response.accessToken, response.refreshToken);
@@ -52,8 +50,6 @@ export const useAuth = () => {
         variant: "destructive",
       });
       return { success: false, error: message };
-    } finally {
-      setLoading(false);
     }
   };
 

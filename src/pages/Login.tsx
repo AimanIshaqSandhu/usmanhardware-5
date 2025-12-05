@@ -23,11 +23,13 @@ const Login = () => {
     }
 
     setIsLoading(true);
-    const result = await login({ username: username.trim(), password });
-    setIsLoading(false);
-
-    if (result.success) {
-      navigate('/', { replace: true });
+    try {
+      const result = await login({ username: username.trim(), password });
+      if (result.success) {
+        navigate('/', { replace: true });
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
