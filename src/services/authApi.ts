@@ -41,12 +41,13 @@ export interface ProfileResponse {
 
 // Get auth base URL from the main API config (same server, different path)
 const getAuthBaseUrl = () => {
-  const baseUrl = apiConfig.getBaseUrl();
-  // Convert from /wp-json/ims/v1 to /api/auth format
-  // e.g., https://usmanhardware.site/wp-json/ims/v1 -> https://usmanhardware.site/api/auth
-  const url = new URL(baseUrl);
-  return `${url.origin}/api/auth`;
+  // If running locally, use localhost:5000
+  return "http://localhost:5000/api/auth";
 };
+
+// Example usage:
+console.log(getAuthBaseUrl()); 
+// Output: http://localhost:5000/api/auth
 
 const authRequest = async <T>(
   endpoint: string,
