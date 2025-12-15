@@ -58,11 +58,20 @@ const Products = () => {
     open: false,
     product: null as any
   });
+  
+  // Summary data for ALL products (not just current page)
+  const [summary, setSummary] = useState({
+    totalProducts: 0,
+    inStock: 0,
+    lowStock: 0,
+    categories: 0
+  });
 
   useEffect(() => {
     fetchProducts(1);
     fetchCategories();
     fetchUnits();
+    fetchSummary();
   }, [searchTerm, categoryFilter]);
 
   const fetchCategories = async () => {
@@ -103,6 +112,36 @@ const Products = () => {
   const fetchUnits = () => {
     // Use predefined comprehensive units list instead of API call
     setUnits(predefinedUnits);
+  };
+
+  // Fetch summary for ALL products (not just current page)
+  const fetchSummary = async () => {
+    try {
+      // Fetch all products to calculate accurate summary
+      const response = await productsApi.getAll({ limit: 10000, status: 'active' });
+      
+      if (response.success) {
+        const allProducts = response.data.products || response.data || [];
+        const productArray = Array.isArray(allProducts) ? allProducts : [];
+        
+        const inStockCount = productArray.filter((p: any) => (p.stock || 0) > (p.minStock || 0)).length;
+        const lowStockCount = productArray.filter((p: any) => {
+          const stock = p.stock || 0;
+          const minStock = p.minStock || 0;
+          return stock <= minStock && stock > 0;
+        }).length;
+        const outOfStockCount = productArray.filter((p: any) => (p.stock || 0) <= 0).length;
+        
+        setSummary({
+          totalProducts: productArray.length,
+          inStock: inStockCount,
+          lowStock: lowStockCount + outOfStockCount, // Combined for the Low Stock card
+          categories: categories.length > 1 ? categories.length - 1 : 0
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch summary:', error);
+    }
   };
 
   const fetchProducts = async (page = 1) => {
@@ -347,7 +386,7 @@ const Products = () => {
     return colors[category] || "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100";
   };
 
-  const lowStockProducts = products.filter(product => product.stock <= product.minStock);
+  
 
   const renderPagination = () => {
     if (pagination.totalPages <= 1) return null;
@@ -528,7 +567,7 @@ const Products = () => {
               <Package className="h-8 w-8 text-blue-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Total Products</p>
-                <p className="text-2xl font-bold text-blue-600">{pagination.totalItems}</p>
+                <p className="text-2xl font-bold text-blue-600">{summary.totalProducts}</p>
               </div>
             </div>
           </CardContent>
@@ -540,7 +579,7 @@ const Products = () => {
               <Package className="h-8 w-8 text-green-500" />
               <div>
                 <p className="text-sm text-muted-foreground">In Stock</p>
-                <p className="text-2xl font-bold text-green-600">{products.filter(p => p.stock > p.minStock).length}</p>
+                <p className="text-2xl font-bold text-green-600">{summary.inStock}</p>
               </div>
             </div>
           </CardContent>
@@ -552,7 +591,7 @@ const Products = () => {
               <AlertTriangle className="h-8 w-8 text-red-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Low Stock</p>
-                <p className="text-2xl font-bold text-red-600">{lowStockProducts.length}</p>
+                <p className="text-2xl font-bold text-red-600">{summary.lowStock}</p>
               </div>
             </div>
           </CardContent>
@@ -800,7 +839,8 @@ const ProductDialog = ({
     const submitData = {
       ...formData,
       price: parseFloat(formData.price),
-      stock: parseFloat(formData.stock),
+      // For new products, stock MUST be 0 - stock is added via Purchase Orders only
+      stock: isEdit ? parseFloat(formData.stock) : 0,
       minStock: parseFloat(formData.minStock),
       costPrice: parseFloat(formData.costPrice),
       maxStock: parseFloat(formData.maxStock)
@@ -897,17 +937,19 @@ const ProductDialog = ({
               required
             />
           </div>
-          <div>
-            <Label htmlFor="stock">Stock Quantity</Label>
-            <Input
-              id="stock"
-              type="number"
-              step="0.01"
-              value={formData.stock}
-              onChange={(e) => handleInputChange('stock', e.target.value)}
-              required
-            />
-          </div>
+          {isEdit && (
+            <div>
+              <Label htmlFor="stock">Stock Quantity</Label>
+              <Input
+                id="stock"
+                type="number"
+                step="0.01"
+                value={formData.stock}
+                onChange={(e) => handleInputChange('stock', e.target.value)}
+                required
+              />
+            </div>
+          )}
           <div>
             <Label htmlFor="minStock">Minimum Stock</Label>
             <Input

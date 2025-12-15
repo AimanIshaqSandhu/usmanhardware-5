@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { productsApi } from "@/services/api";
 import { Package, AlertTriangle, RefreshCw } from "lucide-react";
@@ -58,11 +57,8 @@ export const QuickProductAddModal: React.FC<QuickProductAddModalProps> = ({
     category: '',
     price: '',
     costPrice: '',
-    stock: '',
     unit: 'piece',
-    description: '',
-    incompleteQuantity: false,
-    quantityNote: ''
+    description: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -85,7 +81,8 @@ export const QuickProductAddModal: React.FC<QuickProductAddModalProps> = ({
         sku: formData.sku.trim() || 'N/A',
         category: formData.category || 'Uncategorized',
         price: parseFloat(formData.price) || 0,
-        stock: formData.incompleteQuantity ? 0 : (parseFloat(formData.stock) || 0),
+        // Stock MUST always be 0 - stock is added via Purchase Orders only
+        stock: 0,
         unit: formData.unit || 'piece',
         description: formData.description.trim() || 'N/A',
         status: 'active',
@@ -100,10 +97,10 @@ export const QuickProductAddModal: React.FC<QuickProductAddModalProps> = ({
         reorderLevel: 5,
         location: 'N/A',
         tags: '',
-        notes: formData.incompleteQuantity ? `Incomplete quantity: ${formData.quantityNote}` : '',
+        notes: '',
         isActive: true,
-        trackStock: !formData.incompleteQuantity,
-        allowBackorder: formData.incompleteQuantity,
+        trackStock: true,
+        allowBackorder: false,
         taxable: true,
         taxRate: 0,
         discountable: true,
@@ -118,10 +115,7 @@ export const QuickProductAddModal: React.FC<QuickProductAddModalProps> = ({
       if (response.success) {
         const enhancedProduct = {
           ...response.data,
-          incompleteQuantity: formData.incompleteQuantity,
-          quantityNote: formData.incompleteQuantity ? formData.quantityNote : '',
-          addedFromSales: true,
-          needsQuantityUpdate: formData.incompleteQuantity
+          addedFromSales: true
         };
 
         onProductAdded(enhancedProduct);
@@ -132,18 +126,15 @@ export const QuickProductAddModal: React.FC<QuickProductAddModalProps> = ({
           category: '',
           price: '',
           costPrice: '',
-          stock: '',
           unit: 'piece',
-          description: '',
-          incompleteQuantity: false,
-          quantityNote: ''
+          description: ''
         });
         
         onOpenChange(false);
         
         toast({
           title: "Product Added Successfully",
-          description: `${productData.name} has been added${formData.incompleteQuantity ? ' with incomplete quantity data' : ''}`,
+          description: `${productData.name} has been added. Add stock via Purchase Orders.`,
         });
       } else {
         throw new Error(response.message || 'Failed to create product');
@@ -300,57 +291,23 @@ export const QuickProductAddModal: React.FC<QuickProductAddModalProps> = ({
             </div>
           </div>
 
-          {/* Row 4: Quantity Management */}
+          {/* Description */}
           <div className="border-t pt-3">
-            <div className="flex items-center space-x-2 mb-3">
-              <Checkbox
-                id="incompleteQuantity"
-                checked={formData.incompleteQuantity}
-                onCheckedChange={(checked) => handleInputChange('incompleteQuantity', checked)}
-              />
-              <Label htmlFor="incompleteQuantity" className="text-sm font-medium flex items-center gap-1">
-                <AlertTriangle className="h-4 w-4 text-orange-500" />
-                Incomplete quantity information
-              </Label>
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg mb-3">
+              <p className="text-sm text-blue-700 dark:text-blue-300 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                Stock will start at 0. Add stock via Purchase Orders.
+              </p>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {!formData.incompleteQuantity ? (
-                <div>
-                  <Label htmlFor="stock" className="text-sm font-medium">Stock Quantity</Label>
-                  <Input
-                    id="stock"
-                    type="number"
-                    step="0.01"
-                    value={formData.stock}
-                    onChange={(e) => handleInputChange('stock', e.target.value)}
-                    placeholder="Enter quantity"
-                    className="mt-1"
-                  />
-                </div>
-              ) : (
-                <div>
-                  <Label htmlFor="quantityNote" className="text-sm font-medium">Quantity Note</Label>
-                  <Textarea
-                    id="quantityNote"
-                    value={formData.quantityNote}
-                    onChange={(e) => handleInputChange('quantityNote', e.target.value)}
-                    placeholder="Add a note about the incomplete quantity"
-                    className="mt-1 h-16"
-                  />
-                </div>
-              )}
-              
-              <div>
-                <Label htmlFor="description" className="text-sm font-medium">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="Brief product description (optional)"
-                  className="mt-1 h-16"
-                />
-              </div>
+            <div>
+              <Label htmlFor="description" className="text-sm font-medium">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
+                placeholder="Brief product description (optional)"
+                className="mt-1 h-16"
+              />
             </div>
           </div>
 
