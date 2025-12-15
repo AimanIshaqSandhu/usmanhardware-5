@@ -1,5 +1,5 @@
 
-import { Bell, Package, User, Menu, Home, ChevronRight, Maximize, Minimize, LogOut, Settings } from "lucide-react";
+import { Bell, Package, User, Menu, Home, ChevronRight, Maximize, Minimize } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -19,16 +19,13 @@ import { notificationsApi } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "react-router-dom";
 
 export function Header() {
   const { toast } = useToast();
   const { toggleSidebar } = useSidebar();
   const isMobile = useIsMobile();
   const location = useLocation();
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
   
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -391,36 +388,20 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="/avatars/01.png" alt={user?.first_name || 'User'} />
-                  <AvatarFallback className="bg-primary text-primary-foreground">
-                    {user?.first_name?.[0] || user?.username?.[0] || 'U'}
-                  </AvatarFallback>
+                  <AvatarImage src="/avatars/01.png" alt="Admin" />
+                  <AvatarFallback className="bg-primary text-primary-foreground">A</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 bg-background border shadow-lg z-50" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    {user?.first_name} {user?.last_name}
-                  </p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    {user?.email}
-                  </p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/profile')}>
+              <DropdownMenuItem>
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/settings')}>
-                <Settings className="mr-2 h-4 w-4" />
+              <DropdownMenuItem>
                 <span>Settings</span>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => { logout(); navigate('/login'); }} className="text-destructive focus:text-destructive">
-                <LogOut className="mr-2 h-4 w-4" />
+              <DropdownMenuItem>
                 <span>Logout</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
