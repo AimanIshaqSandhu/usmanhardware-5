@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { stockManagementService, StockAlert, StockMovement, StockValidationResult } from '@/services/stockManagementService';
+import { useState } from 'react';
+import { StockAlert, StockMovement, StockValidationResult } from '@/services/stockManagementService';
+
+// DISABLED: All stock operations are handled by the backend API
+// This hook is now a no-op to prevent frontend stock interference
 
 export const useStockManagement = () => {
-  const { toast } = useToast();
-  const [alerts, setAlerts] = useState<StockAlert[]>([]);
-  const [movements, setMovements] = useState<StockMovement[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [alerts] = useState<StockAlert[]>([]);
+  const [movements] = useState<StockMovement[]>([]);
+  const [loading] = useState(false);
 
-  // Handle order status changes - Let the API handle stock management
+  // Handle order status changes - NO-OP, let backend handle stock
   const handleOrderStatusChange = async (
     orderId: number,
     orderNumber: string,
@@ -16,189 +17,64 @@ export const useStockManagement = () => {
     newStatus: string,
     oldStatus: string
   ) => {
-    try {
-      setLoading(true);
-      console.log(`Processing order status change: ${oldStatus} -> ${newStatus} for order ${orderNumber}`);
-      
-      // The API will handle stock adjustments automatically
-      // We just need to track that the adjustment was made
-      const result = await stockManagementService.handleOrderStatusChange(
-        orderId,
-        orderNumber,
-        orderItems,
-        newStatus,
-        oldStatus
-      );
-
-      if (result.success) {
-        toast({
-          title: "Order Updated",
-          description: "Order status updated successfully",
-        });
-        
-        // Refresh alerts after potential stock change
-        await refreshAlerts();
-      } else {
-        toast({
-          title: "Update Warning",
-          description: result.message,
-          variant: "destructive"
-        });
-      }
-      
-      return result;
-    } catch (error) {
-      console.error('Error handling order status change:', error);
-      toast({
-        title: "Error",
-        description: "Failed to process order status change",
-        variant: "destructive"
-      });
-      return { success: false, message: 'Error updating order status' };
-    } finally {
-      setLoading(false);
-    }
+    console.log(`[STOCK-HOOK-DISABLED] Order status change: ${oldStatus} -> ${newStatus} for order ${orderNumber}`);
+    console.log('[STOCK-HOOK-DISABLED] Stock operations are handled by the backend API');
+    
+    return { success: true, message: 'Stock handled by backend API' };
   };
 
-  // Validate stock before operations
+  // Validate stock - always returns valid, backend handles validation
   const validateStock = async (productId: number, quantity: number): Promise<StockValidationResult> => {
-    try {
-      return await stockManagementService.validateStockAvailability(productId, quantity);
-    } catch (error) {
-      console.error('Stock validation error:', error);
-      return {
-        isValid: false,
-        availableStock: 0,
-        requestedQuantity: quantity,
-        message: 'Error validating stock'
-      };
-    }
+    console.log(`[STOCK-HOOK-DISABLED] Stock validation bypassed for product ${productId}`);
+    return {
+      isValid: true,
+      availableStock: quantity,
+      requestedQuantity: quantity,
+      message: 'Stock validation handled by backend'
+    };
   };
 
-  // Deduct stock for sales
+  // Deduct stock - NO-OP, backend handles this
   const deductStock = async (
     productId: number,
     quantity: number,
     orderId?: number,
     orderNumber?: string
   ) => {
-    try {
-      setLoading(true);
-      const result = await stockManagementService.deductStock(productId, quantity, orderId, orderNumber);
-      
-      if (result.success) {
-        toast({
-          title: "Stock Updated",
-          description: `Stock deducted successfully. New stock: ${result.newStock}`,
-        });
-        
-        await refreshAlerts();
-      } else {
-        toast({
-          title: "Stock Deduction Failed",
-          description: result.message,
-          variant: "destructive"
-        });
-      }
-      
-      return result;
-    } catch (error) {
-      console.error('Stock deduction error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to deduct stock",
-        variant: "destructive"
-      });
-      return { success: false, message: 'Error deducting stock' };
-    } finally {
-      setLoading(false);
-    }
+    console.log(`[STOCK-HOOK-DISABLED] Stock deduction bypassed for product ${productId}`);
+    return { success: true, message: 'Stock handled by backend API' };
   };
 
-  // Add stock for purchases/returns
+  // Add stock - NO-OP, backend handles this
   const addStock = async (
     productId: number,
     quantity: number,
     reason: string = 'Stock addition',
     reference?: string
   ) => {
-    try {
-      setLoading(true);
-      const result = await stockManagementService.addStock(productId, quantity, reason, reference);
-      
-      if (result.success) {
-        toast({
-          title: "Stock Updated",
-          description: `Stock added successfully. New stock: ${result.newStock}`,
-        });
-        
-        await refreshAlerts();
-      } else {
-        toast({
-          title: "Stock Addition Failed",
-          description: result.message,
-          variant: "destructive"
-        });
-      }
-      
-      return result;
-    } catch (error) {
-      console.error('Stock addition error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add stock",
-        variant: "destructive"
-      });
-      return { success: false, message: 'Error adding stock' };
-    } finally {
-      setLoading(false);
-    }
+    console.log(`[STOCK-HOOK-DISABLED] Stock addition bypassed for product ${productId}`);
+    return { success: true, message: 'Stock handled by backend API' };
   };
 
-  // Refresh stock alerts
+  // Refresh alerts - NO-OP
   const refreshAlerts = async () => {
-    try {
-      const newAlerts = await stockManagementService.checkStockAlerts();
-      setAlerts(newAlerts);
-      
-      newAlerts.forEach(alert => {
-        if (alert.severity === 'critical') {
-          toast({
-            title: "Critical Stock Alert",
-            description: `${alert.productName} is out of stock!`,
-            variant: "destructive"
-          });
-        }
-      });
-      
-      return newAlerts;
-    } catch (error) {
-      console.error('Error refreshing alerts:', error);
-      return [];
-    }
+    console.log('[STOCK-HOOK-DISABLED] Alerts refresh bypassed');
+    return [];
   };
 
-  // Get current stock level
+  // Get current stock - returns 0
   const getCurrentStock = async (productId: number): Promise<number> => {
-    try {
-      return await stockManagementService.getCurrentStock(productId);
-    } catch (error) {
-      console.error('Error getting current stock:', error);
-      return 0;
-    }
+    console.log(`[STOCK-HOOK-DISABLED] getCurrentStock bypassed for product ${productId}`);
+    return 0;
   };
 
-  // Calculate inventory value
+  // Calculate inventory value - returns zeros
   const calculateInventoryValue = async () => {
-    try {
-      return await stockManagementService.calculateInventoryValue();
-    } catch (error) {
-      console.error('Error calculating inventory value:', error);
-      return { totalValue: 0, totalProducts: 0 };
-    }
+    console.log('[STOCK-HOOK-DISABLED] calculateInventoryValue bypassed');
+    return { totalValue: 0, totalProducts: 0 };
   };
 
-  // Bulk operations
+  // Bulk operations - NO-OP
   const bulkStockOperation = async (operations: Array<{
     productId: number;
     quantity: number;
@@ -206,53 +82,16 @@ export const useStockManagement = () => {
     reason?: string;
     reference?: string;
   }>) => {
-    try {
-      setLoading(true);
-      const result = await stockManagementService.bulkStockOperation(operations);
-      
-      if (result.success) {
-        toast({
-          title: "Bulk Operation Completed",
-          description: "All stock operations completed successfully",
-        });
-      } else {
-        const failedCount = result.results.filter(r => !r.success).length;
-        toast({
-          title: "Bulk Operation Partial Success",
-          description: `${failedCount} operations failed. Check the details.`,
-          variant: "destructive"
-        });
-      }
-      
-      await refreshAlerts();
-      
-      return result;
-    } catch (error) {
-      console.error('Bulk operation error:', error);
-      toast({
-        title: "Bulk Operation Failed",
-        description: "Failed to complete bulk operations",
-        variant: "destructive"
-      });
-      return { success: false, results: [] };
-    } finally {
-      setLoading(false);
-    }
+    console.log(`[STOCK-HOOK-DISABLED] Bulk operation bypassed for ${operations.length} operations`);
+    return {
+      success: true,
+      results: operations.map(op => ({
+        productId: op.productId,
+        success: true,
+        message: 'Handled by backend API'
+      }))
+    };
   };
-
-  // Initialize alerts on mount
-  useEffect(() => {
-    refreshAlerts();
-  }, []);
-
-  // Update movements from service
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setMovements(stockManagementService.getMovements());
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return {
     // State
@@ -260,7 +99,7 @@ export const useStockManagement = () => {
     movements,
     loading,
     
-    // Actions
+    // Actions - all are no-ops, backend handles stock
     handleOrderStatusChange,
     validateStock,
     deductStock,
